@@ -1,27 +1,68 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class BorrowRecord extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
-  }
-  BorrowRecord.init({
-    user_id: DataTypes.INTEGER,
-    book_id: DataTypes.INTEGER,
-    borrowed_at: DataTypes.DATE,
-    due_at: DataTypes.DATE,
-    returned_at: DataTypes.DATE
-  }, {
+"use strict";
+const { DataTypes } = require("sequelize");
+const sequelize = require("../../config/database");
+
+const BorrowRecord = sequelize.define(
+  "borrowRecord",
+  {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    book_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    borrowed_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    due_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    returned_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+    },
+  },
+  {
     sequelize,
-    modelName: 'BorrowRecord',
+    paranoid: true,
+    freezeTableName: true,
+    modelName: "borrowRecord",
+  }
+);
+
+// Define associations separately
+BorrowRecord.associate = (models) => {
+  BorrowRecord.belongsTo(models.User, {
+    foreignKey: "user_id",
+    as: "user",
   });
-  return BorrowRecord;
+  BorrowRecord.belongsTo(models.Book, {
+    foreignKey: "book_id",
+    as: "book",
+  });
 };
+
+module.exports = BorrowRecord;
